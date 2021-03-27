@@ -1,0 +1,1 @@
+This bot was bootstrapped using example code from https://github.com/microsoft/BotBuilder-Samples Echo bot sample.
