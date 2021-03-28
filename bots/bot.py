@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 from models.conversation_flow import ConversationFlow, Question
-from models.query import Query
+from models.restaurant_query import RestaurantQuery
 from config.config import ConfigReader
-from gmaps.gmaps_service import GoogleMaps_Service
+from services.gmaps_service import GoogleMaps_Service
 
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, ConversationState
 from botbuilder.schema import ChannelAccount
@@ -28,7 +28,7 @@ class RestaurantBot(ActivityHandler):
         self.luis_recognizer = LuisRecognizer(application=self.luis_app,prediction_options=self.luis_options,include_api_results=True)
         self.conversation_state = conversation_state
         self.flow_accessor = self.conversation_state.create_property("ConversationFlow")
-        self.query_accessor = self.conversation_state.create_property("Query")
+        self.query_accessor = self.conversation_state.create_property("RestaurantQuery")
 
     async def on_members_added_activity(
         self, members_added: [ChannelAccount], turn_context: TurnContext
@@ -39,11 +39,17 @@ class RestaurantBot(ActivityHandler):
 
     async def on_message_activity(self, turn_context: TurnContext):
         flow = await self.flow_accessor.get(turn_context, ConversationFlow)
-        query = await self.query_accessor.get(turn_context, Query)
-        await self._get_restaurant_info(flow, query, turn_context)
+        query = await self.query_accessor.get(turn_context, RestaurantQuery)
+        await self._luis_get_restaurant_info(query, turn_context)
         await self.conversation_state.save_changes(turn_context)
     
-    async def _get_restaurant_info(self, flow: ConversationFlow, query: Query, turn_context: TurnContext):
+    async def _luis_get_restaurant_info(self, query: Query, turn_context: TurnContext):
+        luis_result = await self.luis_recognizer.recognize(turn_context)
+        result = luis_result.properties["luisResult"]
+        print(result)
+
+
+    async def _get_restaurant_info(self, flow: ConversationFlow, query: RestaurantQuery, turn_context: TurnContext):
         user_input = turn_context.activity.text.strip()
 
         if flow.last_question_asked == Question.NONE:
