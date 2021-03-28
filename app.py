@@ -10,13 +10,15 @@ from aiohttp import web
 from aiohttp.web import Request, Response, json_response
 from botbuilder.core import (
     BotFrameworkAdapterSettings,
+    ConversationState,
+    MemoryStorage,
     TurnContext,
     BotFrameworkAdapter,
 )
 from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
-from bots.echo_bot import EchoBot
+from bots.bot import RestaurantBot
 
 
 # Create adapter.
@@ -52,11 +54,15 @@ async def on_error(context: TurnContext, error: Exception):
         # Send a trace activity, which will be displayed in Bot Framework Emulator
         await context.send_activity(trace_activity)
 
-
+# Set error handler on adapter
 ADAPTER.on_turn_error = on_error
 
+# Create MemoryStorage, UserState and ConversationState
+MEMORY = MemoryStorage()
+CONVERSATION_STATE = ConversationState(MEMORY)
+
 # Create the Bot
-BOT = EchoBot()
+BOT = RestaurantBot(CONVERSATION_STATE)
 
 
 # Listen for incoming requests on /api/messages
