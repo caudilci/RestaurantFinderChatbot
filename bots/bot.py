@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 from models.conversation_flow import ConversationFlow, Question
 from models.query import Query
+from config.config import ConfigReader
 
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, ConversationState
 from botbuilder.schema import ChannelAccount
@@ -15,7 +16,10 @@ class RestaurantBot(ActivityHandler):
             raise TypeError(
                 "[CustomPromptBot]: Missing parameter. conversation_state is required but None was given"
             )
-        
+        self.config_reader = ConfigReader()
+        self.configuration = self.config_reader.read_config()
+        self.maps_api_key = self.configuration['GOOGLE_PLACES_API_KEY']
+        self.gmaps = googlemaps.Client(key = self.maps_api_key)
         self.conversation_state = conversation_state
         self.flow_accessor = self.conversation_state.create_property("ConversationFlow")
         self.query_accessor = self.conversation_state.create_property("Query")
@@ -57,9 +61,15 @@ class RestaurantBot(ActivityHandler):
             await turn_context.send_activity(
                 MessageFactory.text("Great! Let me find something for you!")
             )
-            await turn_context.send_activity(
-                MessageFactory.text(f"Data: {query.food}, {query.loc}")
-            )
+            maploc = self.gmaps.geocode(address = query.loc)
+            location = maploc[0]['geometry']['location']
+            loc_str = str(location['lat']) + "," + str(location['lng'])
+            place_result = self.gmaps.places_nearby(location=loc_str, keyword=query.food, radius=10000, type = 'restaurant')
+            print(place_result['results'][0]['name'])
+            if place_result != None:
+                await turn_context.send_activity(
+                    MessageFactory.text(f"The closest {query.food} restaurant is {place_result['results'][0]['name']}")
+                )
             flow.last_question_asked = Question.NONE
 
         return
