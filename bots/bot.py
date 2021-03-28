@@ -8,7 +8,6 @@ from gmaps.gmaps_service import GoogleMaps_Service
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, ConversationState
 from botbuilder.schema import ChannelAccount
 # from botbuilder.dialogs import Dialog
-import googlemaps
 
 class RestaurantBot(ActivityHandler):
     # initialize bot conversation state
