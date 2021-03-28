@@ -7,16 +7,25 @@ from gmaps.gmaps_service import GoogleMaps_Service
 
 from botbuilder.core import ActivityHandler, MessageFactory, TurnContext, ConversationState
 from botbuilder.schema import ChannelAccount
-# from botbuilder.dialogs import Dialog
+from botbuilder.ai.luis import LuisApplication,LuisPredictionOptions,LuisRecognizer
+
 
 class RestaurantBot(ActivityHandler):
     # initialize bot conversation state
     def __init__(self, conversation_state: ConversationState):
         if conversation_state is None:
             raise TypeError(
-                "[CustomPromptBot]: Missing parameter. conversation_state is required but None was given"
+                "[RestaurantBot]: Missing parameter. conversation_state is required but None was given"
             )
         self.gmaps_service = GoogleMaps_Service()
+        self.config_reader = ConfigReader()
+        self.configuration = self.config_reader.read_config()
+        self.luis_app_id=self.configuration['LUIS_APP_ID']
+        self.luis_endpoint_key = self.configuration['LUIS_ENDPOINT_KEY']
+        self.luis_endpoint = self.configuration['LUIS_ENDPOINT']
+        self.luis_app = LuisApplication(self.luis_app_id,self.luis_endpoint_key,self.luis_endpoint)
+        self.luis_options = LuisPredictionOptions(include_all_intents=True,include_instance_data=True)
+        self.luis_recognizer = LuisRecognizer(application=self.luis_app,prediction_options=self.luis_options,include_api_results=True)
         self.conversation_state = conversation_state
         self.flow_accessor = self.conversation_state.create_property("ConversationFlow")
         self.query_accessor = self.conversation_state.create_property("Query")
