@@ -43,7 +43,7 @@ class RestaurantBot(ActivityHandler):
         await self._luis_get_restaurant_info(query, turn_context)
         await self.conversation_state.save_changes(turn_context)
     
-    async def _luis_get_restaurant_info(self, query: Query, turn_context: TurnContext):
+    async def _luis_get_restaurant_info(self, query: RestaurantQuery, turn_context: TurnContext):
         luis_result = await self.luis_recognizer.recognize(turn_context)
         result = luis_result.properties["luisResult"]
         print(result)
