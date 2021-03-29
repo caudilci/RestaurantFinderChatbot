@@ -29,7 +29,7 @@ class RestaurantBot(ActivityHandler):
     ):
         for member in members_added:
             if member.id != turn_context.activity.recipient.id:
-                await turn_context.send_activity("Hello! I am the restaurant expert bot!")
+                await turn_context.send_activity("Hello! I am an expert on restaurants! I can help you find the nearest restaurant to a location.")
                 await DialogHelper.run_dialog(
                     self.dialog,
                     turn_context,
