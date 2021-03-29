@@ -72,7 +72,7 @@ class MainDialog(ComponentDialog):
         if step_context.result is not None:
             result = step_context.result
             print(result)
-            msg_txt = f"The nearest restaurant meeting your search criteria is {result['name']}"
+            msg_txt = f"The nearest restaurant meeting your search criteria is {result['name']} at {result['vicinity']}"
             message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
             await step_context.context.send_activity(message)
         
