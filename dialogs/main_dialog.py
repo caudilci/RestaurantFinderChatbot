@@ -28,7 +28,6 @@ class MainDialog(ComponentDialog):
         self.initial_dialog_id = "WFDialog"
 
     async def intro_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        print("intro_step")
         if not self._luis_recognizer.is_configured:
             await step_context.context.send_activity(
                 MessageFactory.text(
@@ -54,11 +53,9 @@ class MainDialog(ComponentDialog):
         )
     
     async def act_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
-        print("act_step")
         intent, luis_result = await LuisHelper.execute_luis_query(
             self._luis_recognizer, step_context.context
         )
-        print(intent)
         if intent == Intent.RESTAURANT.value and luis_result:
             return await step_context.begin_dialog(self._restaurant_finder_dialog_id, luis_result)
         else:
@@ -74,7 +71,8 @@ class MainDialog(ComponentDialog):
     async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         if step_context.result is not None:
             result = step_context.result
-            msg_txt = f"The nearest restaurant meeting your search criteria is [Name Here]"
+            print(result)
+            msg_txt = f"The nearest restaurant meeting your search criteria is {result['name']}"
             message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
             await step_context.context.send_activity(message)
         

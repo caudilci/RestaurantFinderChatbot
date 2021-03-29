@@ -8,7 +8,7 @@ from services.gmaps_service import GoogleMapsService
 class RestaurantFinderDialog(CancelAndHelpDialog):
     def __init__(self, dialog_id: str = None):
         super(RestaurantFinderDialog, self).__init__(dialog_id or RestaurantFinderDialog.__name__)
-
+        self.gmaps_service = GoogleMapsService()
         self.add_dialog(TextPrompt(TextPrompt.__name__))
         self.add_dialog(ConfirmPrompt(ConfirmPrompt.__name__))
         self.add_dialog(
@@ -87,5 +87,6 @@ class RestaurantFinderDialog(CancelAndHelpDialog):
         """
         if step_context.result:
             restaurant_details = step_context.options
-            return await step_context.end_dialog(restaurant_details)
+            result = self.gmaps_service.find_nearest(restaurant_details.food, restaurant_details.loc)
+            return await step_context.end_dialog(result)
         return await step_context.end_dialog()
