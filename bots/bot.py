@@ -3,7 +3,6 @@
 from models.conversation_flow import ConversationFlow, Question
 from models.restaurant_query import RestaurantQuery
 from config.config import ConfigReader
-from services.gmaps_service import GoogleMaps_Service
 from helpers.luis_helper import LuisHelper, Intent
 from helpers.dialog_helper import DialogHelper
 
