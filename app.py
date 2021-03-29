@@ -19,6 +19,9 @@ from botbuilder.core.integration import aiohttp_error_middleware
 from botbuilder.schema import Activity, ActivityTypes
 
 from bots.bot import RestaurantBot
+from dialogs.main_dialog import MainDialog
+from dialogs.restaurant_finder_dialog import RestaurantFinderDialog
+from services.restaurant_recognizer import RestaurantRecognizer
 
 
 # Create adapter.
@@ -61,9 +64,15 @@ ADAPTER.on_turn_error = on_error
 MEMORY = MemoryStorage()
 CONVERSATION_STATE = ConversationState(MEMORY)
 
-# Create the Bot
-BOT = RestaurantBot(CONVERSATION_STATE)
 
+
+# initialize dialogs and LUIS
+RECOGNIZER = RestaurantRecognizer()
+RESTAURANT_FINDER_DIALOG = RestaurantFinderDialog()
+DIALOG = MainDialog(RECOGNIZER, RESTAURANT_FINDER_DIALOG)
+
+# Create the Bot
+BOT = RestaurantBot(CONVERSATION_STATE, DIALOG)
 
 # Listen for incoming requests on /api/messages
 async def messages(req: Request) -> Response:
