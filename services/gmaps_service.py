@@ -1,7 +1,7 @@
 import googlemaps
 from config.config import ConfigReader
 
-class GoogleMaps_Service():
+class GoogleMapsService():
     def __init__(self):
         self.config_reader = ConfigReader()
         self.configuration = self.config_reader.read_config()
