@@ -1,3 +1,9 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+# Heavily modified from original
+# Original can be found at https://github.com/Microsoft/BotBuilder-Samples
+
 from enum import Enum
 from typing import Dict
 from botbuilder.ai.luis import LuisRecognizer
@@ -37,15 +43,6 @@ class LuisHelper:
         try:
             recognizer_result = await luis_recognizer.recognize(turn_context)
             intent = list(recognizer_result.intents.keys())[0]
-            # intent = (
-            #     sorted(
-            #         recognizer_result.intents,
-            #         key=recognizer_result.intents.get,
-            #         reverse=True,
-            #     )[:1][0]
-            #     if recognizer_result.intents
-            #     else None
-            # )
 
             if intent == Intent.RESTAURANT.value:
                 result = RestaurantQuery()
