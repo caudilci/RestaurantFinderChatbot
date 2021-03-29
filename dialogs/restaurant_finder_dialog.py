@@ -18,7 +18,9 @@ class RestaurantFinderDialog(CancelAndHelpDialog):
                     self.food_step,
                     self.location_step,
                     self.confirm_step,
-                    self.final_step,
+                    self.results1_step,
+                    self.results2_step,
+                    self.results3_step,
                 ],
             )
         )
@@ -79,7 +81,7 @@ class RestaurantFinderDialog(CancelAndHelpDialog):
             ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message)
         )
     
-    async def final_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+    async def results1_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
         """
         Complete the interaction and end the dialog.
         :param step_context:
@@ -88,5 +90,73 @@ class RestaurantFinderDialog(CancelAndHelpDialog):
         if step_context.result:
             restaurant_details = step_context.options
             result = self.gmaps_service.find_nearest(restaurant_details.food, restaurant_details.loc)
-            return await step_context.end_dialog(result)
+            msg_txt = f"The nearest restaurant meeting your search criteria is {result['name']} at {result['vicinity']}"
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
+            message_text = (
+            "Would you like to see the next closest restaurant?"
+            )
+            prompt_message = MessageFactory.text(
+                message_text, message_text, InputHints.expecting_input
+            )
+
+            # Offer a YES/NO prompt.
+            return await step_context.prompt(
+                ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message)
+            )
+            await step_context.context.send_activity(message)
+        elif result == None and step_context.result:
+            msg_txt = f"Sorry, I couldn't find any restaurants meeting your requirements."
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
+            return await step_context.end_dialog()
+        else:
+            return await step_context.end_dialog()
+    
+    async def results2_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """
+        Complete the interaction and end the dialog.
+        :param step_context:
+        :return DialogTurnResult:
+        """
+        result = self.gmaps_service.find_next()
+        if result != None and step_context.result:
+            msg_txt = f"The next nearest restaurant meeting your search criteria is {result['name']} at {result['vicinity']}"
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
+            message_text = (
+            "Would you like to see the next closest restaurant?"
+            )
+            prompt_message = MessageFactory.text(
+                message_text, message_text, InputHints.expecting_input
+            )
+
+            # Offer a YES/NO prompt.
+            return await step_context.prompt(
+                ConfirmPrompt.__name__, PromptOptions(prompt=prompt_message)
+            )
+            await step_context.context.send_activity(message)
+        elif result == None and step_context.result:
+            msg_txt = f"Sorry, I couldn't find any restaurants meeting your requirements."
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
+            return await step_context.end_dialog()
+        else:
+            return await step_context.end_dialog()
+    
+    async def results3_step(self, step_context: WaterfallStepContext) -> DialogTurnResult:
+        """
+        Complete the interaction and end the dialog.
+        :param step_context:
+        :return DialogTurnResult:
+        """
+        result = self.gmaps_service.find_next()
+        if result != None and step_context.result:
+            msg_txt = f"The next nearest restaurant meeting your search criteria is {result['name']} at {result['vicinity']}"
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
+        elif result == None and step_context.result:
+            msg_txt = f"Sorry, I couldn't find any restaurants meeting your requirements."
+            message = MessageFactory.text(msg_txt, msg_txt, InputHints.ignoring_input)
+            await step_context.context.send_activity(message)
         return await step_context.end_dialog()
