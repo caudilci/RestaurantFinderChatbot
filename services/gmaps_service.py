@@ -17,6 +17,6 @@ class GoogleMapsService():
         self.results = place_result['results']
         return self.results[0]
     
-    def find_next():
-        self.index += self.index
-        return self.results[index] if len(self.results) > self.index else None
+    def find_next(self):
+        self.index = self.index + 1
+        return self.results[self.index] if len(self.results) > self.index else None
